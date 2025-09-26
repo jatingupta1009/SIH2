@@ -1,73 +1,299 @@
-# Welcome to your Lovable project
+# Jharkhand Marketplace - Full Stack E-commerce Platform
 
-## Project info
+A comprehensive marketplace platform for Jharkhand's local artisans, featuring Amazon-like cart functionality, Razorpay payment integration, and automated seller payouts.
 
-**URL**: https://lovable.dev/projects/4695359c-5ce3-4baf-872a-c07a44a82b90
+## 🚀 Features
 
-## How can I edit this code?
+### Frontend
+- **Amazon-style Product Cards**: Enhanced product display with hover effects
+- **Rich Product Detail Pages**: Image carousels, reviews, Q&A sections
+- **Advanced Cart System**: Persistent cart with seller grouping
+- **Multi-step Checkout**: Address, payment, and order review
+- **Razorpay Integration**: Secure payment processing
+- **Responsive Design**: Mobile-first approach with TailwindCSS
 
-There are several ways of editing your application.
+### Backend
+- **RESTful API**: Complete CRUD operations for all entities
+- **JWT Authentication**: Secure user authentication
+- **MongoDB Integration**: Scalable database with Mongoose ODM
+- **Razorpay SDK**: Payment gateway integration
+- **Webhook Handling**: Real-time payment status updates
+- **Seller Payout System**: Automated payout management
 
-**Use Lovable**
+### Payment & Payouts
+- **Secure Payments**: PCI-compliant payment processing
+- **Multiple Payment Methods**: Cards, UPI, Net Banking, Wallets
+- **Seller Payouts**: Automated transfers to seller accounts
+- **Refund Management**: Complete refund processing
+- **Order Tracking**: Real-time order status updates
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4695359c-5ce3-4baf-872a-c07a44a82b90) and start prompting.
+## 🛠 Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend
+- **React 18** with Vite
+- **TailwindCSS** for styling
+- **shadcn/ui** components
+- **Axios** for API calls
+- **React Context** for state management
 
-**Use your preferred IDE**
+### Backend
+- **Node.js** with Express.js
+- **MongoDB** with Mongoose
+- **JWT** for authentication
+- **Razorpay** for payments
+- **bcrypt** for password hashing
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 📦 Installation & Setup
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Prerequisites
+- Node.js 16+
+- MongoDB (local or Atlas)
+- Razorpay account
 
-Follow these steps:
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+cd jharkhand-marketplace
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### 2. Backend Setup
+```bash
+cd backend
+npm install
+cp env.example .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Configure `.env`:
+```env
+MONGO_URI=mongodb://localhost:27017/jharkhand_marketplace
+RAZORPAY_KEY_ID=rzp_test_your_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+JWT_SECRET=your_jwt_secret
+```
 
-# Step 3: Install the necessary dependencies.
-npm i
+### 3. Frontend Setup
+```bash
+cd ../src
+npm install
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Create `.env.local`:
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_RAZORPAY_KEY_ID=rzp_test_your_key_id
+```
+
+### 4. Database Setup
+```bash
+cd backend
+npm run seed
+```
+
+### 5. Start Development Servers
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run dev
+
+# Terminal 2 - Frontend
+cd src
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🔑 Razorpay Configuration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 1. Create Razorpay Account
+- Sign up at [razorpay.com](https://razorpay.com)
+- Complete KYC verification
 
-**Use GitHub Codespaces**
+### 2. Get API Keys
+- Dashboard → Settings → API Keys
+- Copy Key ID and Key Secret
+- Add to environment variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 3. Configure Webhooks
+- Dashboard → Settings → Webhooks
+- Add webhook URL: `https://yourdomain.com/api/webhooks/razorpay`
+- Select events: `payment.captured`, `payment.failed`, `order.paid`, `transfer.processed`
 
-## What technologies are used for this project?
+### 4. Enable Marketplace Features (Optional)
+- Contact Razorpay support
+- Complete seller onboarding process
+- Update code to use marketplace transfers
 
-This project is built with:
+## 🧪 Testing
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Test Cards (Razorpay Test Mode)
+- **Success**: 4111 1111 1111 1111
+- **Failure**: 4000 0000 0000 0002
+- **CVV**: Any 3 digits
+- **Expiry**: Any future date
 
-## How can I deploy this project?
+### Sample Data
+The seed script creates:
+- 3 verified artisans/sellers
+- 3 sample products
+- 2 test users
+- Sample orders and payouts
 
-Simply open [Lovable](https://lovable.dev/projects/4695359c-5ce3-4baf-872a-c07a44a82b90) and click on Share -> Publish.
+### Test Credentials
+- **User 1**: john.doe@example.com / password123
+- **User 2**: jane.smith@example.com / password123
 
-## Can I connect a custom domain to my Lovable project?
+## 📱 User Flows
 
-Yes, you can!
+### 1. Product Browsing
+- Browse products in grid layout
+- Filter by category, price, location
+- Search products by name/description
+- View product details with image carousel
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### 2. Shopping Cart
+- Add products to cart
+- Adjust quantities
+- Apply coupon codes
+- Group items by seller
+- Calculate shipping and taxes
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### 3. Checkout Process
+- Select shipping address
+- Choose payment method
+- Review order summary
+- Complete payment via Razorpay
+- Receive order confirmation
+
+### 4. Order Management
+- Track order status
+- View order history
+- Cancel orders (if eligible)
+- Request refunds
+
+## 🏪 Seller Features
+
+### 1. Product Management
+- Add/edit products
+- Upload product images
+- Set pricing and inventory
+- Manage product variants
+
+### 2. Order Processing
+- Receive order notifications
+- Update order status
+- Process shipments
+- Handle returns/refunds
+
+### 3. Payout Management
+- View payout history
+- Track payment status
+- Manage bank details
+- Set payout preferences
+
+## 🔒 Security Features
+
+- **JWT Authentication**: Secure token-based auth
+- **Password Hashing**: bcrypt with salt rounds
+- **Rate Limiting**: Prevent API abuse
+- **CORS Protection**: Configured origins only
+- **Input Validation**: Server-side validation
+- **Payment Security**: Razorpay PCI compliance
+- **Webhook Verification**: Signature validation
+
+## 🚀 Deployment
+
+### Production Environment Variables
+```env
+NODE_ENV=production
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/jharkhand_marketplace
+RAZORPAY_KEY_ID=rzp_live_your_live_key_id
+RAZORPAY_KEY_SECRET=your_live_key_secret
+CORS_ORIGIN=https://yourdomain.com
+```
+
+### Deployment Checklist
+- [ ] Set up production MongoDB
+- [ ] Configure Razorpay live keys
+- [ ] Set up webhook endpoints
+- [ ] Configure SSL/HTTPS
+- [ ] Set up monitoring
+- [ ] Configure backups
+
+## 📊 API Documentation
+
+### Authentication Endpoints
+```
+POST /api/auth/signup
+POST /api/auth/login
+GET  /api/auth/me
+```
+
+### Product Endpoints
+```
+GET    /api/products
+GET    /api/products/:slug
+POST   /api/products
+PUT    /api/products/:id
+DELETE /api/products/:id
+```
+
+### Cart Endpoints
+```
+GET  /api/cart
+POST /api/cart
+PUT  /api/cart/:productId
+DELETE /api/cart/:productId
+POST /api/cart/sync
+```
+
+### Checkout Endpoints
+```
+POST /api/checkout/create-order
+POST /api/checkout/verify
+GET  /api/checkout/orders
+GET  /api/checkout/orders/:id
+POST /api/checkout/orders/:id/cancel
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+## 🆘 Support
+
+For issues and questions:
+- Create an issue in the repository
+- Contact: support@jharkhandmarketplace.com
+
+## 🎯 Roadmap
+
+### Phase 1 (Current)
+- [x] Basic marketplace functionality
+- [x] Razorpay payment integration
+- [x] Cart and checkout system
+- [x] Order management
+
+### Phase 2 (Next)
+- [ ] Advanced search and filters
+- [ ] Product reviews and ratings
+- [ ] Seller dashboard
+- [ ] Admin panel
+- [ ] Mobile app
+
+### Phase 3 (Future)
+- [ ] AI-powered recommendations
+- [ ] Multi-language support
+- [ ] Advanced analytics
+- [ ] Marketplace automation
+- [ ] International shipping
+
+---
+
+**Built with ❤️ for Jharkhand's artisans and craftspeople**

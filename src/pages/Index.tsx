@@ -98,6 +98,54 @@ const Index = () => {
     }
   ];
 
+  const heroCarouselData = [
+    {
+      id: 1,
+      title: "Netarhat - Queen of",
+      subtitle: "Chotanagpur",
+      description: "Experience breathtaking sunrises and serene hill station beauty.",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop",
+      primaryButton: "Start Exploring",
+      secondaryButton: "Watch Virtual Tour"
+    },
+    {
+      id: 2,
+      title: "Betla National Park",
+      subtitle: "Wildlife Sanctuary",
+      description: "Discover exotic wildlife and pristine forests in Jharkhand's premier national park.",
+      image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&h=1080&fit=crop",
+      primaryButton: "Start Exploring",
+      secondaryButton: "Watch Virtual Tour"
+    },
+    {
+      id: 3,
+      title: "Lodh Falls",
+      subtitle: "Nature's Wonder",
+      description: "Marvel at Jharkhand's highest waterfall cascading through lush green forests.",
+      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?w=1920&h=1080&fit=crop",
+      primaryButton: "Start Exploring",
+      secondaryButton: "Watch Virtual Tour"
+    },
+    {
+      id: 4,
+      title: "Deoghar Temple",
+      subtitle: "Spiritual Journey",
+      description: "Experience divine tranquility at one of India's most sacred pilgrimage sites.",
+      image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=1920&h=1080&fit=crop",
+      primaryButton: "Start Exploring",
+      secondaryButton: "Watch Virtual Tour"
+    },
+    {
+      id: 5,
+      title: "Tribal Villages",
+      subtitle: "Cultural Heritage",
+      description: "Immerse yourself in the rich traditions and customs of Jharkhand's tribal communities.",
+      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1920&h=1080&fit=crop",
+      primaryButton: "Start Exploring",
+      secondaryButton: "Watch Virtual Tour"
+    }
+  ];
+
   const safetyFeatures = [
     {
       icon: Phone,
@@ -116,9 +164,21 @@ const Index = () => {
     }
   ];
 
+  // Carousel state for hero section
+  const [heroApi, setHeroApi] = useState<CarouselApi | null>(null);
+  const [heroIndex, setHeroIndex] = useState(0);
+
   // Carousel state for marketplace left card
   const [leftMarketApi, setLeftMarketApi] = useState<CarouselApi | null>(null);
   const [leftMarketIndex, setLeftMarketIndex] = useState(0);
+
+  useEffect(() => {
+    if (!heroApi) return;
+    const onSelect = () => setHeroIndex(heroApi.selectedScrollSnap());
+    onSelect();
+    heroApi.on("select", onSelect);
+    return () => heroApi.off("select", onSelect);
+  }, [heroApi]);
 
   useEffect(() => {
     if (!leftMarketApi) return;
@@ -130,18 +190,45 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <div 
-        className="h-screen flex items-center justify-center text-white travel-hero-bg"
-        style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${heroBackground})` }}
+      {/* Hero Section - Carousel */}
+      <div className="h-screen relative">
+        <Carousel 
+          opts={{ loop: true }} 
+          className="w-full h-full" 
+          setApi={(api) => setHeroApi(api)}
+        >
+          <CarouselContent>
+            {heroCarouselData.map((slide) => (
+              <CarouselItem key={slide.id}>
+                <div 
+                  className="h-screen flex items-center justify-center text-white relative"
+                  style={{ 
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${slide.image})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  }}
       >
         <div className="text-center px-4 sm:px-6 lg:px-8 max-w-4xl">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Discover Jharkhand's Hidden Treasures
+                      {slide.title}
           </h1>
+                    <h2 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                      {slide.subtitle}
+                    </h2>
           <p className="text-xl md:text-2xl mb-8 text-gray-200">
-            Experience eco-tourism and rich tribal culture like never before
-          </p>
+                      {slide.description}
+                    </p>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                      <Button variant="hero" size="lg" className="px-8 py-3">
+                        {slide.primaryButton}
+                      </Button>
+                      <Button variant="outline" size="lg" className="px-8 py-3 border-white text-white hover:bg-white hover:text-foreground">
+                        <Play className="h-5 w-5 mr-2" />
+                        {slide.secondaryButton}
+                      </Button>
+                    </div>
           
           {/* Search Bar */}
           <Card className="max-w-4xl mx-auto bg-background/95 backdrop-blur-sm border-0 shadow-2xl">
@@ -168,6 +255,29 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+                  </div>
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          {/* Navigation Arrows */}
+          <CarouselPrevious className="left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-white/30 h-12 w-12" />
+          <CarouselNext className="right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white border-white/30 h-12 w-12" />
+        </Carousel>
+
+        {/* Carousel Indicators */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+          {heroCarouselData.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => heroApi?.scrollTo(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`h-3 rounded-full transition-all ${
+                heroIndex === i ? "bg-white w-8" : "bg-white/50 w-3"
+              }`}
+            />
+          ))}
         </div>
       </div>
 
