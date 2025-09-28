@@ -9,7 +9,6 @@ import ProductCard from "@/components/marketplace/ProductCard";
 import ArtisanCard from "@/components/marketplace/ArtisanCard";
 import ServiceCard from "@/components/marketplace/ServiceCard";
 import BookingModal from "@/components/marketplace/BookingModal";
-import HotelBookingModal from "@/components/marketplace/HotelBookingModal";
 import ProductDetailModal from "@/components/marketplace/ProductDetailModal";
 import Cart from "@/components/marketplace/Cart";
 import { CartProvider } from "@/contexts/CartContext";
@@ -47,14 +46,12 @@ import marketplaceHero from "@/assets/marketplace-hero.jpg";
 const Marketplace = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [activeTab, setActiveTab] = useState<"products" | "artisans" | "services" | "hotels">("products");
+  const [activeTab, setActiveTab] = useState<"products" | "artisans" | "services">("products");
   const [favorites, setFavorites] = useState<number[]>([]);
   const [cart, setCart] = useState<number[]>([]);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isHotelBookingModalOpen, setIsHotelBookingModalOpen] = useState(false);
-  const [selectedHotel, setSelectedHotel] = useState<any>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isProductDetailModalOpen, setIsProductDetailModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -98,7 +95,7 @@ const Marketplace = () => {
       description: "Experience Jharkhand's hospitality with unique accommodations",
       image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=600&fit=crop",
       buttonText: "Book Hotels",
-      buttonLink: "#hotels"
+      buttonLink: "/hotels"
     }
   ];
 
@@ -643,128 +640,6 @@ const Marketplace = () => {
     }
   ];
 
-  const hotels = [
-    {
-      id: 1,
-      name: "Ranchi Heritage Hotel",
-      description: "Luxury heritage hotel in the heart of Ranchi with traditional Jharkhand architecture and modern amenities",
-      price: 4500,
-      originalPrice: 5500,
-      rating: 4.6,
-      reviews: 234,
-      location: "Ranchi",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Pool", "Restaurant", "Spa", "Parking"],
-      category: "Heritage",
-      verified: true,
-      distance: "2.5 km from city center"
-    },
-    {
-      id: 2,
-      name: "Jamshedpur Business Hotel",
-      description: "Modern business hotel with conference facilities and excellent connectivity to industrial areas",
-      price: 3200,
-      originalPrice: 3800,
-      rating: 4.4,
-      reviews: 189,
-      location: "Jamshedpur",
-      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Conference Room", "Restaurant", "Gym", "Parking"],
-      category: "Business",
-      verified: true,
-      distance: "1.8 km from railway station"
-    },
-    {
-      id: 3,
-      name: "Dumka Eco Resort",
-      description: "Eco-friendly resort surrounded by nature, perfect for nature lovers and cultural enthusiasts",
-      price: 2800,
-      originalPrice: 3200,
-      rating: 4.7,
-      reviews: 156,
-      location: "Dumka",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Nature View", "Restaurant", "Cultural Tours", "Parking"],
-      category: "Eco Resort",
-      verified: true,
-      distance: "5.2 km from city center"
-    },
-    {
-      id: 4,
-      name: "Deoghar Temple Stay",
-      description: "Traditional accommodation near Baidyanath Temple with authentic cultural experience",
-      price: 1800,
-      originalPrice: 2200,
-      rating: 4.5,
-      reviews: 298,
-      location: "Deoghar",
-      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Temple Access", "Vegetarian Meals", "Cultural Programs", "Parking"],
-      category: "Temple Stay",
-      verified: true,
-      distance: "0.5 km from Baidyanath Temple"
-    },
-    {
-      id: 5,
-      name: "Chaibasa Silk Hotel",
-      description: "Boutique hotel showcasing local silk culture with handwoven textiles and traditional decor",
-      price: 3500,
-      originalPrice: 4200,
-      rating: 4.8,
-      reviews: 167,
-      location: "Chaibasa",
-      image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Silk Museum", "Restaurant", "Cultural Shows", "Parking"],
-      category: "Boutique",
-      verified: true,
-      distance: "3.1 km from city center"
-    },
-    {
-      id: 6,
-      name: "Hazaribagh Wildlife Lodge",
-      description: "Wildlife lodge near Hazaribagh National Park with safari packages and nature activities",
-      price: 4200,
-      originalPrice: 4800,
-      rating: 4.6,
-      reviews: 145,
-      location: "Hazaribagh",
-      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Safari Tours", "Restaurant", "Nature Walks", "Parking"],
-      category: "Wildlife",
-      verified: true,
-      distance: "8.5 km from national park"
-    },
-    {
-      id: 7,
-      name: "Gumla Forest Retreat",
-      description: "Secluded forest retreat offering authentic tribal experiences and organic forest products",
-      price: 2500,
-      originalPrice: 3000,
-      rating: 4.7,
-      reviews: 98,
-      location: "Gumla",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Forest View", "Organic Meals", "Tribal Tours", "Parking"],
-      category: "Forest Retreat",
-      verified: true,
-      distance: "12 km from city center"
-    },
-    {
-      id: 8,
-      name: "Khunti Craft Hotel",
-      description: "Unique hotel featuring local handicrafts and traditional tribal architecture",
-      price: 2200,
-      originalPrice: 2600,
-      rating: 4.5,
-      reviews: 123,
-      location: "Khunti",
-      image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      amenities: ["WiFi", "Craft Workshop", "Restaurant", "Cultural Tours", "Parking"],
-      category: "Cultural",
-      verified: true,
-      distance: "4.2 km from city center"
-    }
-  ];
 
   // Filtering logic
   const filteredProducts = selectedCategory === "all" 
@@ -784,12 +659,6 @@ const Marketplace = () => {
     service.artisanName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredHotels = hotels.filter(hotel =>
-    hotel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    hotel.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    hotel.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    hotel.category.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   // Handler functions
   const handleAddToCart = (productId: number) => {
@@ -835,18 +704,6 @@ const Marketplace = () => {
     setSelectedService(null);
   };
 
-  const handleBookHotel = (hotelId: number) => {
-    const hotel = hotels.find(h => h.id === hotelId);
-    setSelectedHotel(hotel);
-    setIsHotelBookingModalOpen(true);
-  };
-
-  const handleConfirmHotelBooking = (bookingData: any) => {
-    // In a real app, you'd make an API call to create the hotel booking
-    console.log('Hotel booking confirmed:', bookingData);
-    setIsHotelBookingModalOpen(false);
-    setSelectedHotel(null);
-  };
 
   // Hero carousel useEffect
   useEffect(() => {
@@ -956,14 +813,6 @@ const Marketplace = () => {
             >
               <Calendar className="h-4 w-4 mr-2" />
               Hire Services ({services.length})
-            </Button>
-            <Button
-              variant={activeTab === "hotels" ? "default" : "ghost"}
-              onClick={() => setActiveTab("hotels")}
-              className="px-6"
-            >
-              <MapPin className="h-4 w-4 mr-2" />
-              Hotels ({hotels.length})
             </Button>
           </div>
           
@@ -1094,81 +943,11 @@ const Marketplace = () => {
         </div>
         )}
 
-        {activeTab === "hotels" && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredHotels.map((hotel) => (
-              <Card key={hotel.id} className="travel-card group overflow-hidden">
-                <div className="relative h-48">
-                  <img
-                    src={hotel.image}
-                    alt={hotel.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute top-3 left-3">
-                    <Badge className="bg-primary text-primary-foreground">{hotel.category}</Badge>
-                  </div>
-                  {hotel.verified && (
-                    <div className="absolute top-3 right-3">
-                      <Badge className="bg-background/90 text-foreground">
-                        <Verified className="h-3 w-3 mr-1" />
-                        Verified
-                      </Badge>
-                    </div>
-                  )}
-                  <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/60 text-white px-2 py-1 text-xs">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    <span>{hotel.rating}</span>
-                  </div>
-                </div>
-
-                <CardContent className="p-4">
-                  <h3 className="text-lg font-semibold text-foreground line-clamp-1">{hotel.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{hotel.description}</p>
-
-                  <div className="mt-3 flex items-center text-sm text-muted-foreground">
-                    <MapPin className="h-3.5 w-3.5 mr-1" />
-                    <span>{hotel.location}</span>
-                    <span className="mx-1">•</span>
-                    <span>{hotel.distance}</span>
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {hotel.amenities.slice(0, 3).map((amenity, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {amenity}
-                      </Badge>
-                    ))}
-                    {hotel.amenities.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{hotel.amenities.length - 3} more
-                      </Badge>
-                    )}
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <div className="text-sm">
-                      {hotel.originalPrice && (
-                        <div className="text-xs text-muted-foreground line-through">
-                          ₹{hotel.originalPrice}
-                        </div>
-                      )}
-                      <div className="font-bold text-foreground">₹{hotel.price}</div>
-                      <div className="text-xs text-muted-foreground">per night</div>
-                    </div>
-                    <Button size="sm" onClick={() => handleBookHotel(hotel.id)}>
-                      <Calendar className="h-4 w-4 mr-1" /> Book Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
 
         {/* Load More */}
         <div className="text-center mt-12">
           <Button variant="outline" size="lg">
-            Load More {activeTab === "products" ? "Products" : activeTab === "artisans" ? "Artisans" : activeTab === "services" ? "Services" : "Hotels"}
+            Load More {activeTab === "products" ? "Products" : activeTab === "artisans" ? "Artisans" : "Services"}
           </Button>
         </div>
 
@@ -1234,13 +1013,6 @@ const Marketplace = () => {
         onConfirmBooking={handleConfirmBooking}
       />
 
-      {/* Hotel Booking Modal */}
-      <HotelBookingModal
-        isOpen={isHotelBookingModalOpen}
-        onClose={() => setIsHotelBookingModalOpen(false)}
-        hotel={selectedHotel}
-        onConfirmBooking={handleConfirmHotelBooking}
-      />
 
       {/* Product Detail Modal */}
       <ProductDetailModal

@@ -18,7 +18,7 @@ import {
   X,
   CheckCircle
 } from "lucide-react";
-import { initiatePayment, loadRazorpayScript } from "@/utils/razorpay";
+// Removed Razorpay dependency - using frontend-only flow
 import { format } from "date-fns";
 
 interface BookingModalProps {
@@ -95,54 +95,16 @@ const BookingModal = ({ isOpen, onClose, service, onConfirmBooking }: BookingMod
 
   const handleConfirm = async () => {
     if (service && selectedDate) {
-      const totalAmount = calculateTotal();
+      // Simulate booking confirmation
+      alert(`Booking confirmed for ${service.serviceName}!\nDate: ${format(selectedDate, "PPP")}\nTime: ${bookingData.time}\nTotal: ₹${calculateTotal()}`);
       
-      try {
-        await loadRazorpayScript();
-        
-        const options = {
-          key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_your_key_id',
-          amount: totalAmount * 100, // Amount in paise
-          currency: 'INR',
-          name: 'Jharkhand Marketplace',
-          description: `Booking for ${service.serviceName}`,
-          handler: function (response: any) {
-            console.log('Payment successful:', response);
             onConfirmBooking({
               ...bookingData,
               date: selectedDate,
-              paymentId: response.razorpay_payment_id
-            });
-            onClose();
-            setStep(1);
-          },
-          prefill: {
-            name: bookingData.name || 'Customer Name',
-            email: bookingData.email || 'customer@example.com',
-            contact: bookingData.phone || '9999999999'
-          },
-          notes: {
-            service: service.serviceName,
-            artisan: service.artisanName,
-            date: selectedDate?.toISOString()
-          },
-          theme: {
-            color: '#059669'
-          }
-        };
-
-        const razorpay = new (window as any).Razorpay(options);
-        razorpay.open();
-      } catch (error) {
-        console.error('Payment failed:', error);
-        // Fallback to direct booking without payment
-        onConfirmBooking({
-          ...bookingData,
-          date: selectedDate
+        paymentId: `PAY_${Date.now()}` // Mock payment ID
         });
         onClose();
         setStep(1);
-      }
     }
   };
 

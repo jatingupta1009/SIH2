@@ -215,7 +215,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Shield className="h-4 w-4 text-blue-600" />
-                <span>Secure payment with Razorpay</span>
+                <span>Secure payment with blockchain</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <RotateCcw className="h-4 w-4 text-orange-600" />

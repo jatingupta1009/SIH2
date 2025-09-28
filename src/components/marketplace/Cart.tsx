@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,46 +13,16 @@ interface CartProps {
 }
 
 const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart();
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  const handleCheckout = async () => {
-    setIsCheckingOut(true);
-    try {
-      // Initialize Razorpay
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_your_key_id',
-        amount: getTotalPrice() * 100, // Amount in paise
-        currency: 'INR',
-        name: 'Jharkhand Marketplace',
-        description: `Payment for ${getTotalItems()} items`,
-        order_id: '', // You'll get this from your backend
-        handler: function (response: any) {
-          console.log('Payment successful:', response);
-          clearCart();
+  const handleCheckout = () => {
+    // Navigate first, then close modal
+    navigate('/cart');
+    // Small delay to ensure navigation happens before modal closes
+    setTimeout(() => {
           onClose();
-          // Handle successful payment
-        },
-        prefill: {
-          name: 'Customer Name',
-          email: 'customer@example.com',
-          contact: '9999999999'
-        },
-        notes: {
-          address: 'Customer Address'
-        },
-        theme: {
-          color: '#059669'
-        }
-      };
-
-      const razorpay = new (window as any).Razorpay(options);
-      razorpay.open();
-    } catch (error) {
-      console.error('Payment failed:', error);
-    } finally {
-      setIsCheckingOut(false);
-    }
+    }, 100);
   };
 
   return (
@@ -162,9 +133,8 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
               <Button 
                 onClick={handleCheckout} 
                 className="flex-1"
-                disabled={isCheckingOut}
               >
-                {isCheckingOut ? "Processing..." : "Proceed to Checkout"}
+                Proceed to Checkout
               </Button>
             </div>
 
@@ -175,7 +145,7 @@ const Cart: React.FC<CartProps> = ({ isOpen, onClose }) => {
                 <span className="text-sm font-medium">Secure Payment</span>
               </div>
               <p className="text-sm text-green-700 mt-1">
-                Your payment is secured by Razorpay. We never store your payment details.
+                Your payment is secured by blockchain technology. We never store your payment details.
               </p>
             </div>
           </div>

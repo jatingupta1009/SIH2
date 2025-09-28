@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,31 +13,37 @@ import {
   MapPin, 
   Truck,
   Tag,
-  ArrowRight,
   CreditCard
 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { cartApi } from '@/api/cartApi';
-import { checkoutApi } from '@/api/checkoutApi';
 
-const CartPage = () => {
-  const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart } = useCart();
+const Cart = () => {
+  const navigate = useNavigate();
+  const { cartItems, updateQuantity, removeFromCart, getTotalPrice, getTotalItems, clearCart, refreshCart } = useCart();
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-  const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const [cartData, setCartData] = useState(null);
 
-  // Group items by seller
+  // Debug logging
+  console.log('Cart page - cartItems:', cartItems);
+  console.log('Cart page - cartItems length:', cartItems.length);
+  console.log('Cart page - localStorage cartItems:', localStorage.getItem('cartItems'));
+
+  // Auto-refresh cart on page load
+  React.useEffect(() => {
+    refreshCart();
+  }, [refreshCart]);
+
+  // Group items by vendor (since we don't have seller info in the current cart context)
   const groupedItems = cartItems.reduce((acc, item) => {
-    const sellerId = item.seller.id;
-    if (!acc[sellerId]) {
-      acc[sellerId] = {
-        seller: item.seller,
+    const vendor = item.vendor;
+    if (!acc[vendor]) {
+      acc[vendor] = {
+        vendor: vendor,
         items: []
       };
     }
-    acc[sellerId].items.push(item);
+    acc[vendor].items.push(item);
     return acc;
   }, {});
 
@@ -51,8 +58,8 @@ const CartPage = () => {
     
     setIsApplyingCoupon(true);
     try {
-      // TODO: Implement actual coupon validation API
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (couponCode.toLowerCase() === 'welcome10') {
         setAppliedCoupon({
@@ -76,81 +83,9 @@ const CartPage = () => {
     setAppliedCoupon(null);
   };
 
-  const handleCheckout = async () => {
+  const handleProceedToCheckout = () => {
     if (cartItems.length === 0) return;
-    
-    setIsCheckingOut(true);
-    try {
-      // Prepare order data
-      const orderData = {
-        items: cartItems.map(item => ({
-          productId: item.id,
-          quantity: item.quantity,
-          variant: item.variant
-        })),
-        shippingAddress: {
-          name: 'John Doe',
-          phone: '9876543210',
-          address: '123 Main Street',
-          city: 'Ranchi',
-          state: 'Jharkhand',
-          pincode: '834001',
-          landmark: 'Near Railway Station'
-        },
-        paymentMethod: 'razorpay',
-        coupon: appliedCoupon?.code
-      };
-
-      // Create order
-      const orderResponse = await checkoutApi.createOrder(orderData);
-      
-      // Initialize Razorpay
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_your_key_id',
-        amount: orderResponse.amount * 100, // Amount in paise
-        currency: 'INR',
-        name: 'Jharkhand Marketplace',
-        description: `Payment for order ${orderResponse.orderNumber}`,
-        order_id: orderResponse.razorpayOrderId,
-        handler: async function (response) {
-          try {
-            // Verify payment
-            await checkoutApi.verifyPayment({
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature
-            });
-            
-            // Clear cart and redirect to success page
-            clearCart();
-            alert('Payment successful! Order placed.');
-            // TODO: Navigate to order confirmation page
-          } catch (error) {
-            console.error('Payment verification failed:', error);
-            alert('Payment verification failed');
-          }
-        },
-        prefill: {
-          name: 'Customer Name',
-          email: 'customer@example.com',
-          contact: '9999999999'
-        },
-        notes: {
-          order_id: orderResponse.orderId
-        },
-        theme: {
-          color: '#059669'
-        }
-      };
-
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
-    } catch (error) {
-      console.error('Checkout failed:', error);
-      alert('Checkout failed. Please try again.');
-    } finally {
-      setIsCheckingOut(false);
-    }
+    navigate('/checkout');
   };
 
   if (cartItems.length === 0) {
@@ -160,9 +95,24 @@ const CartPage = () => {
           <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
           <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
           <p className="text-muted-foreground mb-6">Add some products to get started!</p>
-          <Button onClick={() => window.history.back()}>
-            Continue Shopping
-          </Button>
+          <div className="space-y-4">
+            <Button onClick={() => navigate('/marketplace')}>
+              Continue Shopping
+            </Button>
+            {/* Debug button */}
+            <div className="mt-4">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  console.log('Debug - Current localStorage:', localStorage.getItem('cartItems'));
+                  refreshCart();
+                }}
+                className="text-xs"
+              >
+                Debug: Refresh Cart
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -180,8 +130,7 @@ const CartPage = () => {
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <span>Sold by</span>
-                  <span className="text-primary">{group.seller.name}</span>
-                  <Badge variant="secondary">{group.seller.shopName}</Badge>
+                  <span className="text-primary">{group.vendor}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -199,10 +148,10 @@ const CartPage = () => {
                         <span>{item.location}</span>
                       </div>
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="font-bold">₹{item.price.toLocaleString()}</span>
+                        <span className="font-bold">₹{parseInt(item.price.replace(/[₹,]/g, "")).toLocaleString()}</span>
                         {item.originalPrice && (
                           <span className="text-sm text-muted-foreground line-through">
-                            ₹{item.originalPrice.toLocaleString()}
+                            ₹{parseInt(item.originalPrice.replace(/[₹,]/g, "")).toLocaleString()}
                           </span>
                         )}
                       </div>
@@ -318,11 +267,10 @@ const CartPage = () => {
               <Button 
                 className="w-full" 
                 size="lg"
-                onClick={handleCheckout}
-                disabled={isCheckingOut}
+                onClick={handleProceedToCheckout}
               >
                 <CreditCard className="h-4 w-4 mr-2" />
-                {isCheckingOut ? 'Processing...' : 'Proceed to Checkout'}
+                Proceed to Checkout
               </Button>
 
               {/* Security Notice */}
@@ -332,14 +280,14 @@ const CartPage = () => {
                   <span className="text-sm font-medium">Secure Payment</span>
                 </div>
                 <p className="text-sm text-green-700 mt-1">
-                  Your payment is secured by Razorpay. We never store your payment details.
+                  Your payment is secured by blockchain technology. We never store your payment details.
                 </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Continue Shopping */}
-          <Button variant="outline" className="w-full" onClick={() => window.history.back()}>
+          <Button variant="outline" className="w-full" onClick={() => navigate('/marketplace')}>
             Continue Shopping
           </Button>
         </div>
@@ -348,4 +296,4 @@ const CartPage = () => {
   );
 };
 
-export default CartPage;
+export default Cart;

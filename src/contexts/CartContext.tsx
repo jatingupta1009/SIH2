@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface CartItem {
   id: number;
@@ -10,6 +10,11 @@ interface CartItem {
   location: string;
   quantity: number;
   category: string;
+  seller?: {
+    id: string;
+    name: string;
+    shopName: string;
+  };
 }
 
 interface CartContextType {
@@ -20,6 +25,7 @@ interface CartContextType {
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
+  refreshCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -37,19 +43,45 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Initialize with localStorage data if available
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedCartItems = localStorage.getItem('cartItems');
+      console.log('CartContext - Initializing with localStorage:', savedCartItems);
+      if (savedCartItems) {
+        try {
+          const parsedItems = JSON.parse(savedCartItems);
+          console.log('CartContext - Initial parsed items:', parsedItems);
+          return parsedItems;
+        } catch (error) {
+          console.error('Error loading cart items from localStorage:', error);
+        }
+      }
+    }
+    return [];
+  });
+
+  // Save cart items to localStorage whenever cartItems changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('CartContext - Saving to localStorage:', cartItems);
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
 
   const addToCart = (product: any) => {
+    console.log('CartContext - Adding product to cart:', product);
     setCartItems(prev => {
       const existingItem = prev.find(item => item.id === product.id);
+      let newItems;
       if (existingItem) {
-        return prev.map(item =>
+        newItems = prev.map(item =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        return [...prev, {
+        newItems = [...prev, {
           id: product.id,
           title: product.title,
           price: product.price,
@@ -61,6 +93,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           category: product.category
         }];
       }
+      console.log('CartContext - New cart items:', newItems);
+      return newItems;
     });
   };
 
@@ -95,6 +129,45 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 
+  const refreshCart = () => {
+    if (typeof window !== 'undefined') {
+      const savedCartItems = localStorage.getItem('cartItems');
+      console.log('CartContext - Manual refresh from localStorage:', savedCartItems);
+      if (savedCartItems) {
+        try {
+          const parsedItems = JSON.parse(savedCartItems);
+          console.log('CartContext - Manual refresh parsed items:', parsedItems);
+          setCartItems(parsedItems);
+        } catch (error) {
+          console.error('Error refreshing cart items from localStorage:', error);
+        }
+      }
+    }
+  };
+
+  // Add test function to window for debugging
+  if (typeof window !== 'undefined') {
+    (window as any).testCart = {
+      addTestItem: () => {
+        const testItem = {
+          id: 999,
+          title: 'Test Item',
+          price: '₹100',
+          originalPrice: null,
+          image: 'https://via.placeholder.com/150',
+          vendor: 'Test Vendor',
+          location: 'Test Location',
+          quantity: 1,
+          category: 'Test'
+        };
+        addToCart(testItem);
+      },
+      getCartItems: () => cartItems,
+      getLocalStorage: () => localStorage.getItem('cartItems'),
+      refreshCart: refreshCart
+    };
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -105,6 +178,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         clearCart,
         getTotalPrice,
         getTotalItems,
+        refreshCart,
       }}
     >
       {children}
